@@ -12,8 +12,9 @@ export function useCalendar() {
   const today = new Date();
   const todayObj = { y: today.getFullYear(), m: today.getMonth(), d: today.getDate() };
 
-  const [year,  setYear]  = useState(todayObj.y);
-  const [month, setMonth] = useState(todayObj.m);
+const [view, setView] = useState({ year: todayObj.y, month: todayObj.m });
+const year  = view.year;
+const month = view.month;
 
   // Range selection: startDate is always the first click, endDate the second.
   // Displayed range is always sorted (lo→hi) via sortedRange().
@@ -33,19 +34,18 @@ export function useCalendar() {
   // ── Navigation ────────────────────────────────────────────────────────────
   // We track month as a flat index to avoid the year-jump bug.
   // month is always 0-11; we adjust year when it wraps.
-  const navigate = useCallback((dir) => {
-    setMonth(prev => {
-      const next = prev + dir;
-      if (next > 11) { setYear(y => y + 1); return 0; }
-      if (next < 0)  { setYear(y => y - 1); return 11; }
-      return next;
-    });
-  }, []);
+const navigate = useCallback((dir) => {
+  setView(prev => {
+    const next = prev.month + dir;
+    if (next > 11) return { year: prev.year + 1, month: 0 };
+    if (next < 0)  return { year: prev.year - 1, month: 11 };
+    return { ...prev, month: next };
+  });
+}, []);
 
-  const goToToday = useCallback(() => {
-    setYear(todayObj.y);
-    setMonth(todayObj.m);
-  }, [todayObj.y, todayObj.m]);
+const goToToday = useCallback(() => {
+  setView({ year: todayObj.y, month: todayObj.m });
+}, [todayObj.y, todayObj.m]);
 
   // ── Date selection ────────────────────────────────────────────────────────
   const handleDayClick = useCallback((d) => {
