@@ -1,0 +1,570 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap');
+
+/* ── Reset & Root ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Lato', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App wrapper (the "wall") ─────────────────────────────────────────────── */
+.app-wall {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 60px;
+  background: #8B7355;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 48px,
+      rgba(0,0,0,0.03) 48px,
+      rgba(0,0,0,0.03) 49px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48px,
+      rgba(0,0,0,0.03) 48px,
+      rgba(0,0,0,0.03) 49px
+    );
+  transition: background var(--transition-speed);
+}
+
+.app-wall.dark {
+  background: #2a2a2a;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 48px,
+      rgba(255,255,255,0.02) 48px,
+      rgba(255,255,255,0.02) 49px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48px,
+      rgba(255,255,255,0.02) 48px,
+      rgba(255,255,255,0.02) 49px
+    );
+}
+
+/* ── Calendar card (the physical calendar) ────────────────────────────────── */
+.calendar-card {
+  width: 100%;
+  max-width: 920px;
+  border-radius: 4px;
+  overflow: hidden;
+  /* Deep shadow to simulate hanging on a wall */
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.1),
+    0 8px 16px rgba(0,0,0,0.15),
+    0 24px 48px rgba(0,0,0,0.25),
+    0 48px 80px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.calendar-card.flip-forward {
+  animation: flipForward 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.calendar-card.flip-back {
+  animation: flipBack 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes flipForward {
+  0%   { transform: perspective(1400px) rotateX(0deg) scale(1); }
+  40%  { transform: perspective(1400px) rotateX(-8deg) scale(0.96); }
+  100% { transform: perspective(1400px) rotateX(0deg) scale(1); }
+}
+@keyframes flipBack {
+  0%   { transform: perspective(1400px) rotateX(0deg) scale(1); }
+  40%  { transform: perspective(1400px) rotateX(8deg) scale(0.96); }
+  100% { transform: perspective(1400px) rotateX(0deg) scale(1); }
+}
+
+/* ── Spiral binding ───────────────────────────────────────────────────────── */
+.spiral-bar {
+  height: 28px;
+  background: linear-gradient(180deg, #c8c8c8 0%, #a0a0a0 50%, #888 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.spiral-ring {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #666;
+  background: radial-gradient(circle at 35% 35%, #e0e0e0, #888);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 1px 2px rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+
+/* ── Hero image section ───────────────────────────────────────────────────── */
+.hero-section {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.5s;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.05) 0%,
+    rgba(0,0,0,0.1) 50%,
+    rgba(0,0,0,0.65) 100%
+  );
+}
+
+/* Month/year label in hero */
+.hero-label {
+  position: absolute;
+  bottom: 22px;
+  right: 28px;
+  text-align: right;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+}
+
+.hero-mood {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 2px;
+}
+
+.hero-year {
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 5px;
+  opacity: 0.85;
+}
+
+.hero-month {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Nav buttons in hero */
+.hero-nav {
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, transform 0.15s;
+  line-height: 1;
+}
+
+.nav-btn:hover {
+  background: rgba(255,255,255,0.32);
+  transform: scale(1.08);
+}
+
+.today-btn {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+
+.today-btn:hover {
+  background: rgba(255,255,255,0.32);
+}
+
+.dark-mode-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: 20px;
+  padding: 5px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-body);
+  letter-spacing: 1px;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+
+.dark-mode-btn:hover {
+  background: rgba(0,0,0,0.5);
+}
+
+/* ── Body: notes sidebar + calendar grid ─────────────────────────────────── */
+.calendar-body {
+  display: flex;
+  background: #fff;
+  min-height: 340px;
+  transition: background var(--transition-speed);
+}
+
+.calendar-card.dark .calendar-body {
+  background: #1e2130;
+}
+
+/* ── Notes sidebar ────────────────────────────────────────────────────────── */
+.notes-sidebar {
+  width: 210px;
+  min-width: 210px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 1px solid #e8edf5;
+  background: #f8f9fc;
+  transition: background var(--transition-speed), border-color var(--transition-speed);
+}
+
+.calendar-card.dark .notes-sidebar {
+  background: #171b2a;
+  border-right-color: #2d3250;
+}
+
+.notes-section-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: 700;
+  /* color set via inline accent */
+}
+
+.notes-textarea {
+  width: 100%;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, background 0.3s, color 0.3s;
+}
+
+.notes-textarea.month-note {
+  min-height: 80px;
+  background: #fff;
+  border: 1px solid #dde3f0;
+  color: #333;
+}
+
+.notes-textarea.day-note {
+  min-height: 60px;
+}
+
+.calendar-card.dark .notes-textarea.month-note {
+  background: #222640;
+  border-color: #3a3f60;
+  color: #cdd6f4;
+}
+
+.active-date-label {
+  font-size: 11px;
+  font-family: var(--font-body);
+  color: #999;
+  font-style: italic;
+}
+
+.calendar-card.dark .active-date-label {
+  color: #666;
+}
+
+.range-info-box {
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  font-family: var(--font-body);
+  line-height: 1.8;
+  color: #555;
+}
+
+.calendar-card.dark .range-info-box {
+  color: #9aa5ce;
+}
+
+.range-info-box strong {
+  font-weight: 700;
+}
+
+.clear-btn {
+  background: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.clear-btn:hover {
+  opacity: 0.8;
+}
+
+/* ── Calendar grid column ─────────────────────────────────────────────────── */
+.cal-col {
+  flex: 1;
+  padding: 20px 18px 16px 22px;
+}
+
+.day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+.day-header {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/* ── Individual day cell ──────────────────────────────────────────────────── */
+.day-cell {
+  aspect-ratio: 1;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-display);
+  position: relative;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+
+.day-cell:hover:not(.empty) {
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+.day-cell.empty {
+  cursor: default;
+}
+
+.day-cell.state-today {
+  font-weight: 700;
+}
+
+.day-cell.state-endpoint {
+  font-weight: 700;
+  transform: scale(1.12);
+  z-index: 3;
+}
+
+.day-cell.state-range {
+  border-radius: 4px;
+}
+
+/* Note indicator badge */
+.note-indicator {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  /* color set inline */
+}
+
+/* Holiday star */
+.holiday-star {
+  position: absolute;
+  bottom: 2px;
+  font-size: 8px;
+  line-height: 1;
+}
+
+/* Holiday tooltip */
+.holiday-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.92);
+  color: #fff;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.holiday-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: rgba(20, 20, 30, 0.92);
+}
+
+/* ── Legend ───────────────────────────────────────────────────────────────── */
+.legend-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 10px 22px 14px;
+  border-top: 1px solid #edf0f7;
+  background: #fff;
+  transition: background var(--transition-speed), border-color var(--transition-speed);
+}
+
+.calendar-card.dark .legend-bar {
+  background: #1e2130;
+  border-top-color: #2d3250;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  font-family: var(--font-body);
+  color: #aaa;
+}
+
+.calendar-card.dark .legend-item {
+  color: #555;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-ring {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Bottom tape / hanging effect ─────────────────────────────────────────── */
+.wall-pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #c0392b, #7b241c);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .calendar-body {
+    flex-direction: column;
+  }
+  .notes-sidebar {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid #e8edf5;
+  }
+  .hero-section {
+    height: 220px;
+  }
+  .hero-month {
+    font-size: 32px;
+  }
+  .day-cell {
+    font-size: 11px;
+    min-height: 32px;
+  }
+}
