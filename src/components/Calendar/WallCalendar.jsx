@@ -42,7 +42,8 @@ export default function WallCalendar() {
   return (
     <div className={`app-wall ${cal.darkMode ? "dark" : ""}`}>
       <div style={{ width: "100%", maxWidth: "920px", position: "relative" }}>
-
+        <div className="thread left"></div>
+        <div className="thread right"></div>
         {/* Wall pin at the very top */}
         <div className="wall-pin" />
 

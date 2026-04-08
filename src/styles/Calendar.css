@@ -26,23 +26,10 @@ body {
   align-items: center;
   justify-content: center;
   padding: 40px 20px 60px;
-  background: #8B7355;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 48px,
-      rgba(0,0,0,0.03) 48px,
-      rgba(0,0,0,0.03) 49px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 48px,
-      rgba(0,0,0,0.03) 48px,
-      rgba(0,0,0,0.03) 49px
-    );
-  transition: background var(--transition-speed);
+  background: grey;
+  background-image:url("wall.jpg");
+  background-size: cover;
+  position: relative;
 }
 
 .app-wall.dark {
@@ -67,7 +54,7 @@ body {
 /* ── Calendar card (the physical calendar) ────────────────────────────────── */
 .calendar-card {
   width: 100%;
-  max-width: 920px;
+  max-width: 640px;
   border-radius: 4px;
   overflow: hidden;
   /* Deep shadow to simulate hanging on a wall */
@@ -79,6 +66,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,0.6);
   transform-style: preserve-3d;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 auto;
   position: relative;
 }
 
@@ -96,7 +84,7 @@ body {
 }
 @keyframes flipBack {
   0%   { transform: perspective(1400px) rotateX(0deg) scale(1); }
-  40%  { transform: perspective(1400px) rotateX(8deg) scale(0.96); }
+  40%  { transform: perspective(1400px) rotateX(-8deg) scale(0.96); }
   100% { transform: perspective(1400px) rotateX(0deg) scale(1); }
 }
 
@@ -126,7 +114,7 @@ body {
 /* ── Hero image section ───────────────────────────────────────────────────── */
 .hero-section {
   position: relative;
-  height: 280px;
+  height: 300px;
   overflow: hidden;
 }
 
@@ -540,10 +528,32 @@ body {
   background: radial-gradient(circle at 35% 35%, #c0392b, #7b241c);
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
   position: absolute;
-  top: -8px;
+  top: -30px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+}
+
+.thread {
+  position: absolute;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(#444, #222);
+  transform-origin: top;
+  top:-15px
+}
+
+/* left string */
+.thread.left {
+  left: 50%;
+  transform: rotate(-25deg);
+  
+}
+
+/* right string */
+.thread.right {
+  left: 50%;
+  transform: rotate(25deg);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */

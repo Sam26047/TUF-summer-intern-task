@@ -20,7 +20,7 @@ export const MONTH_THEMES = [
   },
   {
     name: "April",
-    img: "https://images.unsplash.com/photo-1490750967868-88df5691cc10?w=900&q=80",
+    img: "https://images.unsplash.com/photo-1723110569304-d5631f60f9d1?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     accent: "#F57F17",
     mood: "Spring Bloom",
   },
