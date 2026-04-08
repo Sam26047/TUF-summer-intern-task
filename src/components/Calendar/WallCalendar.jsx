@@ -7,48 +7,93 @@ import NotesSidebar  from "./NotesSidebar";
 import Legend        from "./Legend";
 import "../../styles/Calendar.css";
 
-/**
- * Top-level calendar component.
- * Composes all sub-components and wires up the useCalendar hook.
- */
 export default function WallCalendar() {
   const cal = useCalendar();
   const theme = MONTH_THEMES[cal.month];
 
-  // Flip animation state — tracked separately from navigation so we
-  // can apply a CSS animation class and remove it cleanly.
+  // Flip animation state
   const [flipClass, setFlipClass] = useState("");
   const flipTimeout = useRef(null);
 
-  function handleNavigate(dir) {
-    // Trigger animation
-    setFlipClass(dir === 1 ? "flip-forward" : "flip-back");
-    clearTimeout(flipTimeout.current);
-    flipTimeout.current = setTimeout(() => setFlipClass(""), 420);
+  // Touch refs
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
-    cal.navigate(dir);
+  function triggerFlip(dir, callback) {
+    // Reset animation (fix stacking bug)
+    setFlipClass("");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setFlipClass(dir === 1 ? "flip-forward" : "flip-back");
+
+        clearTimeout(flipTimeout.current);
+        flipTimeout.current = setTimeout(() => setFlipClass(""), 420);
+
+        callback();
+      });
+    });
   }
 
-  // Keyboard navigation
+  function handleNavigate(dir) {
+    triggerFlip(dir, () => cal.navigate(dir));
+  }
+
+  function handleGoToToday() {
+    triggerFlip(1, () => cal.goToToday());
+  }
+
+  // Keyboard navigation (FIX: prevent scroll)
   useEffect(() => {
-    const onKey = e => {
-      if (e.key === "ArrowRight") handleNavigate(1);
-      if (e.key === "ArrowLeft")  handleNavigate(-1);
+    const onKey = (e) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleNavigate(1);
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleNavigate(-1);
+      }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []); // eslint-disable-line
 
+  // Touch handlers (NEW)
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) < 50) return; // ignore small swipes
+
+    if (diff > 0) {
+      handleNavigate(1);  // swipe left → next
+    } else {
+      handleNavigate(-1); // swipe right → prev
+    }
+  };
+
   return (
     <div className={`app-wall ${cal.darkMode ? "dark" : ""}`}>
       <div style={{ width: "100%", maxWidth: "920px", position: "relative" }}>
+        
+        {/* Threads + pin */}
         <div className="thread left"></div>
         <div className="thread right"></div>
-        {/* Wall pin at the very top */}
         <div className="wall-pin" />
 
-        {/* The physical calendar card */}
-        <div className={`calendar-card ${cal.darkMode ? "dark" : ""} ${flipClass}`}>
+        {/* Calendar */}
+        <div
+          className={`calendar-card ${cal.darkMode ? "dark" : ""} ${flipClass}`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
 
           {/* Spiral binding */}
           <div className="spiral-bar">
@@ -57,18 +102,18 @@ export default function WallCalendar() {
             ))}
           </div>
 
-          {/* Hero photo + month label + nav */}
+          {/* Hero */}
           <HeroSection
             year={cal.year}
             month={cal.month}
             theme={theme}
             darkMode={cal.darkMode}
             onNavigate={handleNavigate}
-            onGoToToday={cal.goToToday}
+            onGoToToday={handleGoToToday}   // ✅ FIXED
             onToggleDark={() => cal.setDarkMode(d => !d)}
           />
 
-          {/* Body: notes sidebar + calendar grid */}
+          {/* Body */}
           <div className="calendar-body">
             <NotesSidebar
               year={cal.year}
@@ -103,7 +148,7 @@ export default function WallCalendar() {
 
         </div>
 
-        {/* Keyboard hint */}
+        {/* Hint */}
         <p style={{
           textAlign: "center",
           fontSize: "11px",
@@ -112,7 +157,7 @@ export default function WallCalendar() {
           color: cal.darkMode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
           fontFamily: "'Lato', sans-serif",
         }}>
-          ← → Arrow keys to navigate • Click a date to select • Click again to end range
+          ← → Arrow keys • Swipe • Click dates to select
         </p>
 
       </div>
