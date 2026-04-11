@@ -31,6 +31,7 @@ These were added on top of the core requirements to showcase additional product 
 - **Note Indicators** — Small colored dot badge appears on day cells that have a saved note
 - **Range Direction Sorting** — The displayed range is always rendered chronologically (lo → hi) regardless of click order, via a `sortedRange()` utility
 - **Range Day Count** — The sidebar shows the number of days in the selected range
+- **Flip Sound Effects** — Distinct audio clips play on forward and backward month navigation, using real recorded page-turn sounds split into two directional cues
 - **Physical Calendar Decorations** — Spiral binding bar with 20 metallic rings, red wall pin, and two angled hanging threads built entirely in CSS
 - **Accent-Aware Theming** — Weekend day numbers, header labels, note badges, sidebar labels, and the legend all inherit the current month's accent color dynamically via inline styles
 
@@ -128,6 +129,7 @@ No login required — fully public.
 | Add a day note | Click any date — a **Day Note** textarea appears in the sidebar |
 | See a holiday name | Hover over a ⭐ marked date |
 | Toggle dark mode | Click **☾ Dark** / **☀ Light** in the top-right of the hero image |
+| Hear flip sound | Navigate months in either direction — forward and backward flips play different sounds |
 
 ---
 
