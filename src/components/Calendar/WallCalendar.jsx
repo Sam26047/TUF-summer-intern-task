@@ -26,7 +26,7 @@ export default function WallCalendar() {
     try {
       const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
       audio.currentTime = 0;
-      audio.volume = 0.5;
+      audio.volume = 1.0;
       audio.play();
     } catch(e) {}
   }
