@@ -19,7 +19,20 @@ export default function WallCalendar() {
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
+  const flipForwardAudio = new Audio("/flip-forward.wav");
+  const flipBackAudio    = new Audio("/flip-backward.wav");
+
+  function playFlipSound(dir) {
+    try {
+      const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
+      audio.currentTime = 0;
+      audio.volume = 0.5;
+      audio.play();
+    } catch(e) {}
+  }
+
   function triggerFlip(dir, callback) {
+    playFlipSound(dir); //play flip sound
     // Reset animation (fix stacking bug)
     setFlipClass("");
 
