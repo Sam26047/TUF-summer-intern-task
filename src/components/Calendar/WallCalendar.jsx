@@ -6,6 +6,7 @@ import CalendarGrid  from "./CalendarGrid";
 import NotesSidebar  from "./NotesSidebar";
 import Legend        from "./Legend";
 import "../../styles/Calendar.css";
+import SoundUnlockModal from "./SoundUnlockModal";
 
 export default function WallCalendar() {
   const cal = useCalendar();
@@ -24,6 +25,37 @@ export default function WallCalendar() {
 
   // Add this ref at the top of the component
   const audioUnlocked = useRef(false);
+
+  const [showSoundModal, setShowSoundModal] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  useEffect(() => {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) setShowSoundModal(true);
+}, []);
+
+
+function handleSoundUnlock(enabled) {
+  setShowSoundModal(false);
+  setSoundEnabled(enabled);
+  if (enabled) {
+    // This tap IS the first interaction — unlock audio right now
+    flipForwardAudio.play().then(() => {
+      flipForwardAudio.pause();
+      flipForwardAudio.currentTime = 0;
+    }).catch(() => {});
+  }
+}
+
+function playFlipSound(dir) {
+  if (!soundEnabled) return;
+  try {
+    const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
+    audio.currentTime = 0;
+    audio.volume = 1.0;
+    audio.play();
+  } catch(e) {}
+}
 
   // Add this function
   function unlockAudio() {
@@ -192,6 +224,12 @@ export default function WallCalendar() {
         </p>
 
       </div>
+            {showSoundModal && (
+          <SoundUnlockModal
+            onUnlock={handleSoundUnlock}
+            darkMode={cal.darkMode}
+          />
+        )}
     </div>
   );
 }
