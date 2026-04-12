@@ -12,68 +12,39 @@ export default function WallCalendar() {
   const cal = useCalendar();
   const theme = MONTH_THEMES[cal.month];
 
-  // Flip animation state
   const [flipClass, setFlipClass] = useState("");
   const flipTimeout = useRef(null);
 
-  // Touch refs
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
-  const flipForwardAudio = new Audio("/flip-forward.wav");
-  const flipBackAudio    = new Audio("/flip-backward.wav");
+  const flipForwardAudio = useRef(new Audio("/flip-forward.wav"));
+  const flipBackAudio    = useRef(new Audio("/flip-backward.wav"));
 
-  // Add this ref at the top of the component
-  const audioUnlocked = useRef(false);
+  const soundEnabled = useRef(false);
 
   const [showSoundModal, setShowSoundModal] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false);
 
   useEffect(() => {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) setShowSoundModal(true);
-}, []);
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) setShowSoundModal(true);
+  }, []);
 
-
-function handleSoundUnlock(enabled) {
-  setShowSoundModal(false);
-  setSoundEnabled(enabled);
-  if (enabled) {
-    // This tap IS the first interaction — unlock audio right now
-    flipForwardAudio.play().then(() => {
-      flipForwardAudio.pause();
-      flipForwardAudio.currentTime = 0;
-    }).catch(() => {});
-  }
-}
-
-function playFlipSound(dir) {
-  if (!soundEnabled) return;
-  try {
-    const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
-    audio.currentTime = 0;
-    audio.volume = 1.0;
-    audio.play();
-  } catch(e) {}
-}
-
-  // Add this function
-  function unlockAudio() {
-    if (audioUnlocked.current) return;
-    flipForwardAudio.play().then(() => {
-      flipForwardAudio.pause();
-      flipForwardAudio.currentTime = 0;
-    }).catch(() => {});
-    flipBackAudio.play().then(() => {
-      flipBackAudio.pause();
-      flipBackAudio.currentTime = 0;
-    }).catch(() => {});
-    audioUnlocked.current = true;
+  function handleSoundUnlock(enabled) {
+    setShowSoundModal(false);
+    soundEnabled.current = enabled;
+    if (enabled) {
+      flipForwardAudio.current.play().then(() => {
+        flipForwardAudio.current.pause();
+        flipForwardAudio.current.currentTime = 0;
+      }).catch(() => {});
+    }
   }
 
   function playFlipSound(dir) {
+    if (!soundEnabled.current) return;
     try {
-      const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
+      const audio = dir === 1 ? flipForwardAudio.current : flipBackAudio.current;
       audio.currentTime = 0;
       audio.volume = 1.0;
       audio.play();
@@ -81,17 +52,13 @@ function playFlipSound(dir) {
   }
 
   function triggerFlip(dir, callback) {
-    playFlipSound(dir); //play flip sound
-    // Reset animation (fix stacking bug)
+    playFlipSound(dir);
     setFlipClass("");
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setFlipClass(dir === 1 ? "flip-forward" : "flip-back");
-
         clearTimeout(flipTimeout.current);
         flipTimeout.current = setTimeout(() => setFlipClass(""), 420);
-
         callback();
       });
     });
@@ -105,77 +72,56 @@ function playFlipSound(dir) {
     triggerFlip(1, () => cal.goToToday());
   }
 
-  // Keyboard navigation (FIX: prevent scroll)
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        handleNavigate(1);
-      }
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        handleNavigate(-1);
-      }
+      if (e.key === "ArrowRight") { e.preventDefault(); handleNavigate(1); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); handleNavigate(-1); }
     };
-
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []); // eslint-disable-line
 
-  // Touch handlers (NEW)
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].clientX;
-
     const diff = touchStartX.current - touchEndX.current;
-
-    if (Math.abs(diff) < 50) return; // ignore small swipes
-
-    if (diff > 0) {
-      handleNavigate(1);  // swipe left → next
-    } else {
-      handleNavigate(-1); // swipe right → prev
-    }
+    if (Math.abs(diff) < 50) return;
+    if (diff > 0) handleNavigate(1);
+    else handleNavigate(-1);
   };
 
   return (
     <div className={`app-wall ${cal.darkMode ? "dark" : ""}`}>
       <div style={{ width: "100%", maxWidth: "920px", position: "relative" }}>
-        
-        {/* Threads + pin */}
+
         <div className="thread left"></div>
         <div className="thread right"></div>
         <div className="wall-pin" />
 
-        {/* Calendar */}
         <div
           className={`calendar-card ${cal.darkMode ? "dark" : ""} ${flipClass}`}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-
-          {/* Spiral binding */}
           <div className="spiral-bar">
             {Array.from({ length: 20 }).map((_, i) => (
               <div key={i} className="spiral-ring" />
             ))}
           </div>
 
-          {/* Hero */}
           <HeroSection
             year={cal.year}
             month={cal.month}
             theme={theme}
             darkMode={cal.darkMode}
             onNavigate={handleNavigate}
-            onGoToToday={handleGoToToday}   // ✅ FIXED
+            onGoToToday={handleGoToToday}
             onToggleDark={() => cal.setDarkMode(d => !d)}
           />
 
-          {/* Body */}
           <div className="calendar-body">
             <NotesSidebar
               year={cal.year}
@@ -191,7 +137,6 @@ function playFlipSound(dir) {
               accent={theme.accent}
               darkMode={cal.darkMode}
             />
-
             <CalendarGrid
               year={cal.year}
               month={cal.month}
@@ -205,12 +150,9 @@ function playFlipSound(dir) {
             />
           </div>
 
-          {/* Legend */}
           <Legend accent={theme.accent} />
-
         </div>
 
-        {/* Hint */}
         <p style={{
           textAlign: "center",
           fontSize: "11px",
@@ -223,12 +165,13 @@ function playFlipSound(dir) {
         </p>
 
       </div>
-            {showSoundModal && (
-          <SoundUnlockModal
-            onUnlock={handleSoundUnlock}
-            darkMode={cal.darkMode}
-          />
-        )}
+
+      {showSoundModal && (
+        <SoundUnlockModal
+          onUnlock={handleSoundUnlock}
+          darkMode={cal.darkMode}
+        />
+      )}
     </div>
   );
 }
