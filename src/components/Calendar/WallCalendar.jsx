@@ -22,6 +22,23 @@ export default function WallCalendar() {
   const flipForwardAudio = new Audio("/flip-forward.wav");
   const flipBackAudio    = new Audio("/flip-backward.wav");
 
+  // Add this ref at the top of the component
+  const audioUnlocked = useRef(false);
+
+  // Add this function
+  function unlockAudio() {
+    if (audioUnlocked.current) return;
+    flipForwardAudio.play().then(() => {
+      flipForwardAudio.pause();
+      flipForwardAudio.currentTime = 0;
+    }).catch(() => {});
+    flipBackAudio.play().then(() => {
+      flipBackAudio.pause();
+      flipBackAudio.currentTime = 0;
+    }).catch(() => {});
+    audioUnlocked.current = true;
+  }
+
   function playFlipSound(dir) {
     try {
       const audio = dir === 1 ? flipForwardAudio : flipBackAudio;
@@ -104,6 +121,7 @@ export default function WallCalendar() {
         {/* Calendar */}
         <div
           className={`calendar-card ${cal.darkMode ? "dark" : ""} ${flipClass}`}
+          onClick={unlockAudio} 
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
