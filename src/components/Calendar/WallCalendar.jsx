@@ -153,7 +153,6 @@ function playFlipSound(dir) {
         {/* Calendar */}
         <div
           className={`calendar-card ${cal.darkMode ? "dark" : ""} ${flipClass}`}
-          onClick={unlockAudio} 
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
